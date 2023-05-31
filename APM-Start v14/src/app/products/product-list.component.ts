@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { IProduct } from './product';
 import { ProductService } from './product.service';
-import { NgModel } from '@angular/forms';
+import { CriteriaComponent } from '../shared/criteria/criteria.component';
 
 @Component({
   templateUrl: './product-list.component.html',
@@ -10,24 +10,13 @@ import { NgModel } from '@angular/forms';
 export class ProductListComponent implements OnInit, AfterViewInit {
   pageTitle = 'Product List';
   showImage = false;
+  includeDetail: boolean = true;
+  @ViewChild(CriteriaComponent) filterComponent: CriteriaComponent;
+  parentListFilter: string;
 
   imageWidth = 50;
   imageMargin = 2;
-  errorMessage:string = '';
-
-  @ViewChild('filterElement') filterElementRef!: ElementRef;
-  
-  private _listFilter: string = '';
-  filterName: string = '';
-
-  get listFilter(): string {
-    return this._listFilter;
-  }
-
-  set listFilter(value: string) {
-    this._listFilter = value;
-    this.performFilter(this.listFilter);
-  }
+  errorMessage:string;
 
   filteredProducts: IProduct[] = [];
   products: IProduct[] = [];
@@ -35,14 +24,15 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   constructor(private productService: ProductService) { 
   }
   ngAfterViewInit(): void {
-    this.filterElementRef?.nativeElement.focus();
+    this.parentListFilter = this.filterComponent.listFilter;
   }
+  
 
   ngOnInit(): void {
     this.productService.getProducts().subscribe({
       next: products => {
         this.products = products;
-        this.performFilter(this.listFilter);
+        this.performFilter(this.parentListFilter);
       },
       error: err => this.errorMessage = err
     });
@@ -59,6 +49,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     } else {
       this.filteredProducts = this.products;
     }
+  }
+
+  onValueChanges(valueChange: string): void {
+    this.performFilter(valueChange);
   }
 
 }
