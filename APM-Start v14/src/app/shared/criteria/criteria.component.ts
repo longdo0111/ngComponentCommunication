@@ -24,7 +24,9 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
   
   @ViewChild('filterElement') filterElementRef: ElementRef;
 
-  constructor() { }
+  constructor() {
+    console.log("fitler component init")
+   }
   ngOnChanges(changes: SimpleChanges): void {
     // console.log(changes);
     if (changes['hitCount'] && !changes['hitCount'].currentValue) {
